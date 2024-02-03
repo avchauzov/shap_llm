@@ -1,11 +1,14 @@
 import random
 import string
+from collections import Counter
 
 import numpy as np
 
+from outliers import huber_m_outliers, mad_outliers, modified_z_score_outliers, percentile_based_outliers, tukey_fences_outliers
+
 
 def generate_random_dict():
-	num_elements = random.randint(2, 128)
+	num_elements = random.randint(32, 128)
 	random_dict = {}
 	
 	keys = np.random.choice(list(string.ascii_lowercase), num_elements)
@@ -13,37 +16,56 @@ def generate_random_dict():
 		value = random.uniform(-1, 1)
 		random_dict[key] = value
 	
+	random_dict = dict(sorted(random_dict.items(), key=lambda item: item[1], reverse=True))
 	return random_dict
 
 
 combinations = [generate_random_dict() for _ in range(128)]
 
+outliers = []
+for index, combination in enumerate(combinations):
+	outlier = modified_z_score_outliers(combination)
+	outlier.extend(tukey_fences_outliers(combination))
+	outlier.extend(percentile_based_outliers(combination))
+	outlier.extend(mad_outliers(combination))
+	outlier.extend(huber_m_outliers(combination))
+	
+	outlier = Counter(outlier)
+	outlier = sorted(outlier.items(), key=lambda item: (-item[1], item[0]))
+	outlier = dict(outlier)
+	
+	positive_outlier = {key: value for key, value in outlier.items() if combination.get(key) > 0}
+	negative_outlier = {key: value for key, value in outlier.items() if combination.get(key) < 0}
+	
+	outliers.append([positive_outlier, negative_outlier])
+
+for i, (combination, outlier) in enumerate(zip(combinations, outliers)):
+	print(f'Combination: {combination}')
+	
+	if len(list(outlier[0].values())) > 0:
+		positive_outlier = '; '.join([f'"{key}"' if value == 1 else f'"{key}" (occurred {value} times)' for key, value in outlier[0].items()])
+		print(f'Positive Outliers: {positive_outlier}')
+	
+	else:
+		print(f'Positive Outliers: not found')
+	
+	if len(list(outlier[1].values())) > 0:
+		negative_outlier = '; '.join([f'"{key}"' if value == 1 else f'"{key}" (occurred {value} times)' for key, value in outlier[1].items()])
+		print(f'Negative Outliers: {negative_outlier}')
+	
+	else:
+		print(f'Negative Outliers: not found')
+	
+	print()
+
+'''
+Please provide keys and their scores for any positive outliers in the dictionary. Additionally, provide keys and their scores for any negative outliers. If a key appears more than once as an outlier, please mention its occurrence. Write an answer in a single paragraph.
+'''
+
+'''
 for index, combination in enumerate(combinations):
 	total = sum(abs(value) for value in combination.values())
 	new_combination = {key: (value / total, 'positive') if value > 0 else (np.abs(value / total), 'negative') if value < 0 else (0.0, 'no_influence') for key, value in combination.items()}
 	new_combination = dict(sorted(new_combination.items(), key=lambda value: value[1][0], reverse=True))
 	combinations[index] = new_combination
-
-for i, combination in enumerate(combinations[:5], 1):
-	print(f"Combination {i}: {combination}")
-
-'''
-Can you analyze these SHAP values for feature influences on the target variable and provide a summary highlighting the positive and negative factors, their distribution, and any notable clusters or outliers?
-'''
-
-'''
-Positive Influences:
-The most positively influential feature is f with a SHAP value of 0.1021, indicating that higher values of f are likely to increase the prediction of the target variable.
-Other positive contributors include w (0.0782), i (0.0647), x (0.0444), r (0.0391), g (0.0367), e (0.0175), and k (0.0132). These features, when present or increased in value, tend to push the model's predictions higher.
-The distribution of positive features shows a wide range of influence, from f having the strongest positive impact to k with the least. This suggests a variety of features play a role in positively influencing the target, but their degree of impact varies significantly.
-Negative Influences:
-The feature with the most negative influence on the target variable is s with a SHAP value of 0.1112, suggesting that increases in s lead to lower predictions of the target variable.
-Other negatively influencing features include p (0.0903), z (0.0795), l (0.0752), u (0.0667), a (0.0614), d (0.0302), y (0.0300), n (0.0288), v (0.0162), and b (0.0149). These features, when their values increase, generally contribute to lowering the model's output.
-The negative features exhibit a similar range of influence as the positive ones, with s being the most impactful in reducing the target variable's prediction and b having the least negative impact. This highlights a balance in how different features can pull the prediction in opposite directions.
-Notable Clusters and Outliers:
-Positive and negative influences are relatively balanced in terms of the number of features contributing to each side, but the magnitude of their influence varies. Features like s, f, p, and z are more dominant in their respective directions.
-There's a notable cluster of features (u, l, z, p) with negative influences that are closely grouped together in terms of their SHAP values, suggesting these features might be related or have similar effects on the model's predictions.
-As for outliers, f stands out as the most significant positive outlier, while s is the most significant negative outlier. These features are especially important for understanding the model's behavior since they have the strongest individual impacts.
-Summary:
-This analysis of SHAP values indicates a balanced but varied influence of features on the target variable, with both positive and negative contributors. The significant spread in the magnitude of SHAP values highlights the importance of considering each feature's individual impact on the model's predictions. Identifying clusters and outliers among these features can also provide insights into how different aspects of the data interact with the model, potentially guiding further data analysis or feature engineering efforts to improve model performance.
 '''
