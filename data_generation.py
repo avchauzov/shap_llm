@@ -40,6 +40,7 @@ for index, combination in enumerate(combinations):
 	outliers.append([positive_outlier, negative_outlier])
 
 for i, (combination, outlier) in enumerate(zip(combinations, outliers)):
+	combination = {key: np.round(value, 2) for key, value in combination.items()}
 	print(f'Combination: {combination}')
 	
 	if len(list(outlier[0].values())) > 0:
@@ -59,7 +60,22 @@ for i, (combination, outlier) in enumerate(zip(combinations, outliers)):
 	print()
 
 '''
-Please provide keys and their scores for any positive outliers in the dictionary. Additionally, provide keys and their scores for any negative outliers. If a key appears more than once as an outlier, please mention its occurrence. Write an answer in a single paragraph.
+Request:
+"""
+Combination: {'c': 0.69, 'v': 0.63, 'r': 0.61, 'g': 0.58, 'l': 0.49, 'f': 0.39, 'b': 0.35, 'a': 0.31, 'm': 0.27, 'k': 0.19, 's': 0.18, 'o': 0.17, 'i': 0.02, 'd': -0.17, 'p': -0.36, 'n': -0.48, 'e': -0.51, 'w': -0.66, 'z': -0.77, 'h': -0.78, 'y': -0.78, 'u': -0.92, 'j': -0.92, 'x': -0.93, 'q': -0.96, 't': -0.99}
+Positive Outliers: "c"; "v"
+Negative Outliers: "q"; "t"
+"""
+
+Response:
+For this model, we see two potential features that significantly positively influence the output: "c" and "v", with scores of 0.69 and 0.63, respectively. On the other side, features "q" and "t" pull the target down with scores of 0.99 and 0.96.
+
+Request:
+"""
+Combination: {'p': 0.84, 'k': 0.83, 'h': 0.77, 'a': 0.77, 'v': 0.57, 'j': 0.45, 'd': 0.41, 'i': 0.36, 'z': 0.32, 'm': 0.2, 'l': -0.01, 'r': -0.1, 's': -0.14, 'n': -0.14, 't': -0.21, 'g': -0.23, 'e': -0.31, 'x': -0.37, 'y': -0.39, 'b': -0.53, 'o': -0.53, 'w': -0.62, 'u': -0.65, 'q': -0.8, 'f': -0.89, 'c': -0.93}
+Positive Outliers: "k"; "p"
+Negative Outliers: "c"; "f"
+"""
 '''
 
 '''
