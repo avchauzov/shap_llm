@@ -3,11 +3,14 @@ import string
 
 import numpy as np
 import shap
+from matplotlib import pyplot as plt
 from sklearn.datasets import make_regression
 from sklearn.linear_model import SGDRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
+
+shap.initjs()
 
 def generate_random_string(length_range):
 	length = random.randint(*length_range)
@@ -74,10 +77,21 @@ for _ in range(128):
 	print(shap_values.base_values.shape)
 	print(shap_values.data.shape)
 	
-	shap.plots.scatter(shap_values[:, 0])
+	# fig, ax = plt.subplots()
+	
+	# Generate the scatter plot with shap.plots.scatter() and pass the ax parameter
+	shap.plots.scatter(shap_values[:, 0], show=False)
+	plt.savefig('test.png', bbox_inches='tight')
 	
 	'''
-	shap.plots.scatter. from statistical and model developer point of view, please explain this picture. single paragraph, 128 words max.
+	Provide a statistical and model development analysis for the given SHAP dependence scatter plot. The plot displays the relationship between a particular feature's value (displayed on the x-axis) and its SHAP value (on the y-axis), quantifying the feature's impact on the model's predictions. A linear trend,
+	either positive or negative, indicates a direct correlation between the feature value and its influence on the output. The analysis should:
+1. Describe the nature of the linear relationship between the feature and its SHAP values.
+2. Evaluate the underlying distribution of the feature's values, noting any skewness or kurtosis that may indicate a deviation from normality.
+3. Assess the influence of edge values or outliers on the model's predictions, particularly whether these values are associated with extreme SHAP values.
+4. Provide numerical context to the SHAP values, indicating the range and spread of values, which reflects the strength of the feature's influence on the model output.
+
+Single paragraph. 128 words max.
 	'''
 	
 	break
