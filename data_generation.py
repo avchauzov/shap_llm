@@ -8,9 +8,8 @@ from sklearn.datasets import make_regression
 from sklearn.linear_model import SGDRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from tqdm import tqdm
 
-
-shap.initjs()
 
 def generate_random_string(length_range):
 	length = random.randint(*length_range)
@@ -28,7 +27,7 @@ def generate_unique_random_strings(num_strings, length_range):
 	return list(generated_strings)
 
 
-for _ in range(128):
+for index in tqdm(range(128)):
 	n_samples = random.randint(1024, 8096)
 	n_features = random.randint(4, 128)
 	n_informative = random.randint(4, n_features)
@@ -65,33 +64,22 @@ for _ in range(128):
 	mean_values = shap_values.values.mean(axis=0)
 	zero_indices = np.where(mean_values == 0)[0]
 	
-	print(shap_values.values.shape)
-	print(shap_values.base_values.shape)
-	print(shap_values.data.shape)
-	
 	shap_values.values = np.delete(shap_values.values, zero_indices, axis=1)
 	shap_values.data = np.delete(shap_values.data, zero_indices, axis=1)
 	shap_values.feature_names = [feature_names[i] for i in range(len(feature_names)) if i not in zero_indices]
 	
-	print(shap_values.values.shape)
-	print(shap_values.base_values.shape)
-	print(shap_values.data.shape)
+	if shap_values.shape[1] == 0:
+		continue
 	
-	# fig, ax = plt.subplots()
-	
-	# Generate the scatter plot with shap.plots.scatter() and pass the ax parameter
+	# plt.figure(figsize=(5, 5))
 	shap.plots.scatter(shap_values[:, 0], show=False)
-	plt.savefig('test.png', bbox_inches='tight')
 	
-	'''
-	Provide a statistical and model development analysis for the given SHAP dependence scatter plot. The plot displays the relationship between a particular feature's value (displayed on the x-axis) and its SHAP value (on the y-axis), quantifying the feature's impact on the model's predictions. A linear trend,
-	either positive or negative, indicates a direct correlation between the feature value and its influence on the output. The analysis should:
-1. Describe the nature of the linear relationship between the feature and its SHAP values.
-2. Evaluate the underlying distribution of the feature's values, noting any skewness or kurtosis that may indicate a deviation from normality.
-3. Assess the influence of edge values or outliers on the model's predictions, particularly whether these values are associated with extreme SHAP values.
-4. Provide numerical context to the SHAP values, indicating the range and spread of values, which reflects the strength of the feature's influence on the model output.
+	plt.savefig(f'_data/shap_plots_scatter/sgdregressor/{index}.png', bbox_inches='tight')  # , dpi=75)
+	plt.close()
 
-Single paragraph. 128 words max.
-	'''
-	
-	break
+'''
+Task:
+Refine your analysis of a SHAP dependence scatter plot by detailing the linear correlation between the feature's value (x-axis) and its SHAP value (y-axis), which reveals the feature's predictive power. Describe the linear trend and its direction to illustrate the relationship's nature. Examine the feature's value distribution,
+highlighting any skewness or kurtosis that suggests a non-normal distribution. Evaluate the impact of outliers or extreme values on the model's predictions, focusing on whether these instances correspond with significant SHAP values. This concise evaluation should encompass the relationship's dynamics,
+distribution characteristics, and the influence of atypical data points on the prediction accuracy, all within a succinct 128-word framework.
+'''
