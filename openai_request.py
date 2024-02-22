@@ -82,3 +82,7 @@ for file_path in tqdm(folder_path.glob('*.png')):
 
 df = pd.DataFrame(output, columns=['file_path', 'description'])
 df.to_csv('_data/shap_plots_scatter/linear/description.csv', index=False)
+
+'''
+https://github.com/doccano/doccano
+'''
