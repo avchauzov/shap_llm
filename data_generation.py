@@ -5,9 +5,9 @@ import numpy as np
 import shap
 from matplotlib import pyplot as plt
 from sklearn.datasets import make_regression
-from sklearn.linear_model import SGDRegressor
+from sklearn.linear_model import ElasticNet
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler, RobustScaler, StandardScaler
 from tqdm import tqdm
 
 
@@ -41,21 +41,30 @@ for index in tqdm(range(128)):
 	test_size = random.uniform(0.05, 0.25)
 	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
 	
-	scaler = StandardScaler()
+	scaler_name = random.choice(['StandardScaler', 'MinMaxScaler', 'MaxAbsScaler', 'RobustScaler', None])
+	if scaler_name == 'StandardScaler':
+		scaler = StandardScaler()
+	
+	elif scaler_name == 'MinMaxScaler':
+		scaler = MinMaxScaler((0.1, 0.9))
+	
+	elif scaler_name == 'MaxAbsScaler':
+		scaler = MaxAbsScaler()
+	
+	else:
+		scaler = RobustScaler()
+	
 	X_train_scaled = scaler.fit_transform(X_train)
 	X_test_scaled = scaler.transform(X_test)
 	
-	loss = random.choice(['squared_error', 'huber', 'epsilon_insensitive', 'squared_epsilon_insensitive'])
-	penalty = random.choice(['l2', 'l1', 'elasticnet', None])
-	alpha = random.random()
+	alpha = random.uniform(1e-3, 128)
 	l1_ratio = random.random()
 	fit_intercept = random.choice([True, False])
-	tol = random.uniform(1e-3, 1e-1)
 	
-	sgd_regressor = SGDRegressor(max_iter=1024, loss=loss, penalty=penalty, alpha=alpha, l1_ratio=l1_ratio, fit_intercept=fit_intercept, tol=tol)
-	sgd_regressor.fit(X_train_scaled, y_train)
+	model = ElasticNet(alpha=alpha, l1_ratio=l1_ratio, fit_intercept=fit_intercept)
+	model.fit(X_train_scaled, y_train)
 	
-	explainer = shap.explainers.Linear(sgd_regressor, X_train_scaled)
+	explainer = shap.explainers.Linear(model, X_train_scaled)
 	shap_values = explainer(X_test_scaled)
 	
 	shap_values.feature_names = feature_names
@@ -74,7 +83,7 @@ for index in tqdm(range(128)):
 	# plt.figure(figsize=(5, 5))
 	shap.plots.scatter(shap_values[:, 0], show=False)
 	
-	plt.savefig(f'_data/shap_plots_scatter/sgdregressor/{index}.png', bbox_inches='tight')  # , dpi=75)
+	plt.savefig(f'_data/shap_plots_scatter/sgdregressor/images/{index}.png', bbox_inches='tight')  # , dpi=75)
 	plt.close()
 
 '''
