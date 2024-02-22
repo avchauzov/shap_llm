@@ -83,7 +83,7 @@ for index in tqdm(range(128)):
 	# plt.figure(figsize=(5, 5))
 	shap.plots.scatter(shap_values[:, 0], show=False)
 	
-	plt.savefig(f'_data/shap_plots_scatter/sgdregressor/images/{index}.png', bbox_inches='tight')  # , dpi=75)
+	plt.savefig(f'_data/shap_plots_scatter/linear/images/{index}.png', bbox_inches='tight')  # , dpi=75)
 	plt.close()
 
 '''

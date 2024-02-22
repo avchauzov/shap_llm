@@ -35,7 +35,7 @@ def encode_image(image_path):
 
 
 output = []
-folder_path = Path('_data/shap_plots_scatter/sgdregressor/images')
+folder_path = Path('_data/shap_plots_scatter/linear/images')
 for file_path in tqdm(folder_path.glob('*.png')):
 	image = Image.open(file_path)
 	width, height = image.size
@@ -81,4 +81,4 @@ for file_path in tqdm(folder_path.glob('*.png')):
 # break
 
 df = pd.DataFrame(output, columns=['file_path', 'description'])
-df.to_csv('_data/shap_plots_scatter/sgdregressor/description.csv', index=False)
+df.to_csv('_data/shap_plots_scatter/linear/description.csv', index=False)
