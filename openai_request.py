@@ -29,6 +29,7 @@ PROMPT = ' '.join(
 		 f'This concise evaluation should encompass the relationship\'s dynamics, distribution characteristics, and the influence of atypical data points on the prediction accuracy, all within a succinct {OUTPUT_SIZE} - word framework.']
 		)
 
+
 def encode_image(image_path):
 	with open(image_path, 'rb') as image_file:
 		return base64.b64encode(image_file.read()).decode('utf-8')
@@ -81,8 +82,6 @@ for file_path in tqdm(folder_path.glob('*.png')):
 # break
 
 df = pd.DataFrame(output, columns=['file_path', 'description'])
-df.to_csv('_data/shap_plots_scatter/linear/description.csv', index=False)
+df.to_csv('_data/shap_plots_scatter/linear/description.csv', index=False, encoding='utf8')
 
-'''
-https://github.com/doccano/doccano
-'''
+# https://wandb.ai/byyoung3/ml-news/reports/How-to-Fine-Tune-LLaVA-on-a-Custom-Dataset--Vmlldzo2NjUwNTc1
