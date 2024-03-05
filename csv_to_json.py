@@ -10,7 +10,7 @@ df = pd.read_csv('_data/shap_plots_scatter/linear/description.csv', encoding='ut
 df['id'] = [str(uuid.uuid4()) for _ in df.index]
 df.rename({'file_name': 'id'}, axis=1, inplace=True)
 
-df['conversations'] = df['description'].apply(lambda description: [{'from': 'human', 'value': 'What is shown in the image?'}, {'from': 'gpt', 'value': description}])
+df['conversations'] = df['description'].apply(lambda description: [{'from': 'human', 'value': '<image>\nWhat is shown in the image?'}, {'from': 'gpt', 'value': description}])
 df.drop(['description'], axis=1, inplace=True)
 
 df['_type'] = [random.choices(['train', 'test'], weights=[0.75, 0.25])[0] for _ in df.index]
